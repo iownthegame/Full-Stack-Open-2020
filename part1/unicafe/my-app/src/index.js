@@ -5,8 +5,8 @@ const Button = ({ onClick, text }) => (
   <button onClick={onClick}>{text}</button>
 )
 
-const Stat = ({ name, number }) => (
-  <p>{name} {number}</p>
+const Statistic = ({ text, value }) => (
+  <p>{text} {value}</p>
 )
 
 const Statistics = ({ good, neutral, bad }) => {
@@ -20,12 +20,12 @@ const Statistics = ({ good, neutral, bad }) => {
       {
         sum === 0 ? 'No feedback given': (
           <>
-            <Stat name='good' number={good} />
-            <Stat name='neutral' number={neutral} />
-            <Stat name='bad' number={bad} />
-            <Stat name='all' number={sum} />
-            <Stat name='average' number={average} />
-            <Stat name='positive' number={positive + '%'} />
+            <Statistic text='good' value={good} />
+            <Statistic text='neutral' value={neutral} />
+            <Statistic text='bad' value={bad} />
+            <Statistic text='all' value={sum} />
+            <Statistic text='average'value={average} />
+            <Statistic text='positive' value={positive + '%'} />
           </>
         )
       }
