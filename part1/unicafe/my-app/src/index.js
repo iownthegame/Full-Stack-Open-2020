@@ -17,12 +17,18 @@ const Statistics = ({ good, neutral, bad }) => {
   return (
     <>
       <h1>statistics</h1>
-      <Stat name='good' number={good} />
-      <Stat name='neutral' number={neutral} />
-      <Stat name='bad' number={bad} />
-      <Stat name='all' number={sum} />
-      <Stat name='average' number={average} />
-      <Stat name='positive' number={positive + '%'} />
+      {
+        sum === 0 ? 'No feedback given': (
+          <>
+            <Stat name='good' number={good} />
+            <Stat name='neutral' number={neutral} />
+            <Stat name='bad' number={bad} />
+            <Stat name='all' number={sum} />
+            <Stat name='average' number={average} />
+            <Stat name='positive' number={positive + '%'} />
+          </>
+        )
+      }
     </>
   )
 }
