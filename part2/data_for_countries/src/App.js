@@ -15,12 +15,8 @@ const App = () => {
     setFilterName(value)
     setShownCountry(null)
 
-    if (!value) {
-      setFilterCountries([])
-      return
-    }
-
-    setFilterCountries(countries.filter(country => country.name.toLowerCase().includes(value.toLowerCase())))
+    let newCountries = value ? countries.filter(country => country.name.toLowerCase().includes(value.toLowerCase())) : []
+    setFilterCountries(newCountries)
   }
 
   const handleCountryChange = (country) => {
@@ -41,7 +37,6 @@ const App = () => {
   return (
     <div>
       <Filter value={filterName} onChange={handleFilterChange} />
-
       <Countries countries={filterCountries} shownCountry={shownCountry} handleCountryChange={handleCountryChange} />
     </div>
   )

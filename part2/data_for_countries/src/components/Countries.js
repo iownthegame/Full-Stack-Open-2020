@@ -23,4 +23,4 @@ const Countries = ({ countries, shownCountry, handleCountryChange } ) => {
   return null
 }
 
-export default Countries;
+export default Countries
