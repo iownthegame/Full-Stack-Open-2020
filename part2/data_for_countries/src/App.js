@@ -2,48 +2,18 @@ import axios from 'axios'
 import React, { useState, useEffect } from 'react'
 
 import Filter from './components/Filter'
-
-const Country = ({ country }) => {
-  return (
-    <>
-      <h1>{country.name}</h1>
-      <div>capital {country.capital}</div>
-      <div>polulation {country.population}</div>
-
-      <h2>languages</h2>
-      <ul>
-        {country.languages.map(language => <li key={language.name}>{language.name}</li>)}
-      </ul>
-
-      <img src={country.flag} width="120" alt="flag" />
-    </>
-  )
-}
-
-const Countries = ({ countries } ) => {
-  if (countries.length > 10) {
-    return <div>Too many mathces, specify another filter</div>
-  }
-
-  if (countries.length > 1) {
-    return countries.map(country => <div key={country.name}>{country.name}</div>)
-  }
-
-  if (countries.length === 1) {
-    return <Country country={countries[0]} />
-  }
-
-  return null
-}
+import Countries from './components/Countries'
 
 const App = () => {
   const [ filterName, setFilterName ] = useState('')
   const [ countries, setCountries] = useState([])
   const [ filterCountries, setFilterCountries] = useState([])
+  const [ shownCountry, setShownCountry] = useState(null)
 
   const handleFilterChange = (event) => {
     const value = event.target.value
     setFilterName(value)
+    setShownCountry(null)
 
     if (!value) {
       setFilterCountries([])
@@ -51,6 +21,10 @@ const App = () => {
     }
 
     setFilterCountries(countries.filter(country => country.name.toLowerCase().includes(value.toLowerCase())))
+  }
+
+  const handleCountryChange = (country) => {
+    setShownCountry(country)
   }
 
   const hook = () => {
@@ -68,7 +42,7 @@ const App = () => {
     <div>
       <Filter value={filterName} onChange={handleFilterChange} />
 
-      <Countries countries={filterCountries} />
+      <Countries countries={filterCountries} shownCountry={shownCountry} handleCountryChange={handleCountryChange} />
     </div>
   )
 }
