@@ -1,4 +1,3 @@
-import axios from 'axios'
 import React, { useState, useEffect } from 'react'
 
 import Filter from './components/Filter'
@@ -32,6 +31,17 @@ const App = () => {
         setPersons(persons.concat(returnedPerson))
         setNewName('')
         setNewNumber('')
+      })
+  }
+
+  const deletePerson = (id, name) => {
+    const res = window.confirm(`Delete ${name} ?`);
+    if (!res) return;
+
+    personService
+      .remove(id)
+      .then(res => {
+        setPersons(persons.filter(p => p.id !== id))
       })
   }
 
@@ -72,7 +82,7 @@ const App = () => {
       />
 
       <h3>Numbers</h3>
-      <Persons persons={showPersons} />
+      <Persons persons={showPersons} onDelete={deletePerson} />
     </div>
   )
 }
