@@ -11,7 +11,7 @@ const App = () => {
   const [ newNumber, setNewNumber ] = useState('')
   const [ filterName, setFilterName ] = useState('')
 
-  const addName = (event) => {
+  const addPerson = (event) => {
     event.preventDefault()
 
     const names = persons.map(person => person.name)
@@ -25,9 +25,13 @@ const App = () => {
       number: newNumber
     }
 
-    setPersons(persons.concat(personObject))
-    setNewName('')
-    setNewNumber('')
+    axios
+    .post('http://localhost:3001/persons', personObject)
+    .then(response => {
+      setPersons(persons.concat(personObject))
+      setNewName('')
+      setNewNumber('')
+    })
   }
 
   const handleNameChange = (event) => {
@@ -67,7 +71,7 @@ const App = () => {
       <h3>Add a new</h3>
 
       <PersonForm
-        onSubmit={addName}
+        onSubmit={addPerson}
         nameValue={newName}
         nameOnChange={handleNameChange}
         numberValue={newNumber}
