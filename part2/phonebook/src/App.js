@@ -39,6 +39,10 @@ const App = () => {
           setNewName('')
           setNewNumber('')
         })
+        .catch(_error => {
+          setNotification('error', `Information of ${newName} has already been removed from server`)
+          setPersons(persons.filter(person => person.id !== id))
+        })
       return
     }
 
