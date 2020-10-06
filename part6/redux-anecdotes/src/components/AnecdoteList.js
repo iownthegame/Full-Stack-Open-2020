@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from 'react-redux'
 
 const AnecdoteList = (props) => {
   const anecdotes = useSelector(state => state.anecdotes)
+  const filter = useSelector(state => state.filter)
   const dispatch = useDispatch()
 
   const vote = ({ id, content }) => {
@@ -17,10 +18,11 @@ const AnecdoteList = (props) => {
   }
 
   const sortedAnecdotes = anecdotes.sort((a, b) => (a.votes > b.votes) ? -1 : 1)
+  const filterAnecdotes = sortedAnecdotes.filter(anecdote => anecdote.content.includes(filter))
 
   return (
     <>
-      {sortedAnecdotes.map(anecdote =>
+      {filterAnecdotes.map(anecdote =>
         <div key={anecdote.id}>
           <div>
             {anecdote.content}
