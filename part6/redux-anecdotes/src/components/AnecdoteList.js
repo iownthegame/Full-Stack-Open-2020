@@ -9,7 +9,6 @@ const AnecdoteList = (props) => {
   const dispatch = useDispatch()
 
   const vote = ({ id, content }) => {
-    console.log('vote', id)
     dispatch(addVote(id))
     dispatch(setNotification(`You voted '${content}'`))
     setTimeout(() => {
@@ -28,8 +27,7 @@ const AnecdoteList = (props) => {
             {anecdote.content}
           </div>
           <div>
-            has {anecdote.votes}
-            <button onClick={() => vote(anecdote)}>vote</button>
+            has {anecdote.votes} <button onClick={() => vote(anecdote)}>vote</button>
           </div>
         </div>
       )}
