@@ -88,21 +88,25 @@ const CreateNew = ({ addNew, setNotification }) => {
     info.reset()
   }
 
+  const { reset: contentReset, ...contentProps } = content
+  const { reset: authorReset, ...authorProps } = author
+  const { reset: infoReset, ...infoProps } = info
+
   return (
     <div>
       <h2>create a new anecdote</h2>
       <form onSubmit={handleSubmit}>
         <div>
           content
-          <input {...content} />
+          <input {...contentProps} />
         </div>
         <div>
           author
-          <input {...author} />
+          <input {...authorProps} />
         </div>
         <div>
           url for more info
-          <input {...info} />
+          <input {...infoProps} />
         </div>
         <button>create</button>
         <button onClick={handleReset}>reset</button>
