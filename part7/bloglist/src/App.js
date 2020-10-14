@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
@@ -7,16 +7,17 @@ import Notification from './components/Notification'
 import Togglable from './components/Togglable'
 import BlogForm from './components/BlogForm'
 import { setNotification, removeNotification } from './reducers/notificationReducer'
+import { initializeBlogs, updateBlog } from './reducers/blogReducer'
 
 import './App.css'
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
 
   const dispatch = useDispatch()
+  const blogs = useSelector(state => state.blogs)
 
   const showNotification = (type, text, time=3000) => {
     dispatch(setNotification({ type, text }))
@@ -26,11 +27,8 @@ const App = () => {
   }
 
   useEffect(() => {
-    blogService.getAll().then(blogs =>
-      setBlogs( blogs )
-    )
-  }, [])
-
+    dispatch(initializeBlogs())
+  },[dispatch])
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
@@ -63,24 +61,6 @@ const App = () => {
     setUser(null)
   }
 
-  const addBlog = (blogObject) => {
-    blogService
-      .create(blogObject)
-      .then(returnedBlog => {
-        setBlogs(blogs.concat(returnedBlog))
-      })
-  }
-
-  const deleteBlog = (blogObject) => {
-    if (!window.confirm(`Remove blog ${blogObject.title}`)) return
-
-    blogService
-      .remove(blogObject.id)
-      .then(() => {
-        setBlogs(blogs.filter(blog => blog.id !== blogObject.id))
-      })
-  }
-
   const handleLikeClick = (blogObject) => {
     const updateBlogObject = {
       user: blogObject.user.id,
@@ -90,11 +70,7 @@ const App = () => {
       url: blogObject.url
     }
 
-    blogService
-      .update(blogObject.id, updateBlogObject)
-      .then(() => {
-        setBlogs(blogs.map(blog => blog.id === blogObject.id ? { ...blogObject, likes: blogObject.likes + 1 } : blog))
-      })
+    dispatch(updateBlog(blogObject.id, updateBlogObject))
   }
 
   const loginForm = () => (
@@ -146,7 +122,7 @@ const App = () => {
       <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
 
       <Togglable buttonLabel="create new blog">
-        <BlogForm createBlog={addBlog} />
+        <BlogForm />
       </Togglable>
 
       {sortedBlogs.map(blog =>
@@ -155,7 +131,6 @@ const App = () => {
           blog={blog}
           handleLikeClick={handleLikeClick}
           user={user}
-          deleteBlog={deleteBlog}
         />
       )}
     </div>
