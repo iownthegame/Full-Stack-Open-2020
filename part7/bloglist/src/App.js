@@ -8,16 +8,17 @@ import Togglable from './components/Togglable'
 import BlogForm from './components/BlogForm'
 import { setNotification, removeNotification } from './reducers/notificationReducer'
 import { initializeBlogs, updateBlog } from './reducers/blogReducer'
+import { setUser, clearUser } from './reducers/userReducer'
 
 import './App.css'
 
 const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [user, setUser] = useState(null)
 
   const dispatch = useDispatch()
   const blogs = useSelector(state => state.blogs)
+  const user = useSelector(state => state.user)
 
   const showNotification = (type, text, time=3000) => {
     dispatch(setNotification({ type, text }))
@@ -35,9 +36,9 @@ const App = () => {
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       blogService.setToken(user.token)
-      setUser(user)
+      dispatch(setUser(user))
     }
-  }, [])
+  }, [dispatch])
 
   const handleLogin = async (event) => {
     event.preventDefault()
@@ -48,7 +49,7 @@ const App = () => {
 
       window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user))
       blogService.setToken(user.token)
-      setUser(user)
+      dispatch(setUser(user))
       setUsername('')
       setPassword('')
     } catch (exception) {
@@ -58,7 +59,7 @@ const App = () => {
 
   const handleLogout = () => {
     window.localStorage.removeItem('loggedBlogappUser')
-    setUser(null)
+    dispatch(clearUser)
   }
 
   const handleLikeClick = (blogObject) => {
