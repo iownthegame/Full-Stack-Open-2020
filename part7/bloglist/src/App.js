@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
@@ -8,9 +9,49 @@ import Togglable from './components/Togglable'
 import BlogForm from './components/BlogForm'
 import { setNotification, removeNotification } from './reducers/notificationReducer'
 import { initializeBlogs, updateBlog } from './reducers/blogReducer'
-import { setUser, clearUser } from './reducers/userReducer'
+import { setUser, clearUser } from './reducers/signedinUserReducer'
+import { initializeUsers } from './reducers/userReducer'
 
 import './App.css'
+
+const BlogList = ({ blogs, user, handleLikeClick }) => (
+  <div>
+    <Togglable buttonLabel="create new blog">
+      <BlogForm />
+    </Togglable>
+
+    {blogs.map(blog =>
+      <Blog
+        key={blog.id}
+        blog={blog}
+        handleLikeClick={handleLikeClick}
+        user={user}
+      />
+    )}
+  </div>
+)
+
+const Users = ({ users }) => (
+  <div>
+    <h2>Users</h2>
+    <table>
+      <thead>
+        <tr>
+          <th></th>
+          <th>blogs created</th>
+        </tr>
+      </thead>
+      <tbody>
+        {users.map(user =>
+          <tr key={user.id}>
+            <td>{user.name}</td>
+            <td>{user.blogs.length}</td>
+          </tr>
+        )}
+      </tbody>
+    </table>
+  </div>
+)
 
 const App = () => {
   const [username, setUsername] = useState('')
@@ -19,6 +60,7 @@ const App = () => {
   const dispatch = useDispatch()
   const blogs = useSelector(state => state.blogs)
   const user = useSelector(state => state.user)
+  const users = useSelector(state => state.users)
 
   const showNotification = (type, text, time=3000) => {
     dispatch(setNotification({ type, text }))
@@ -29,6 +71,7 @@ const App = () => {
 
   useEffect(() => {
     dispatch(initializeBlogs())
+    dispatch(initializeUsers())
   },[dispatch])
 
   useEffect(() => {
@@ -100,41 +143,26 @@ const App = () => {
     </form>
   )
 
-  if (user === null) {
-    return (
-      <div>
-        <h2>Log in to application</h2>
-
-        <Notification />
-
-        {loginForm()}
-      </div>
-    )
-  }
-
   const sortedBlogs = blogs.sort((a, b) => (a.likes > b.likes) ? -1 : 1)
 
   return (
-    <div>
-      <h2>blogs</h2>
+    <Router>
+      <div>
+        <h2>{user === null ? 'Log in to application' : 'blogs'}</h2>
+        <Notification />
+        {user === null ? loginForm() : <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>}
 
-      <Notification />
-
-      <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
-
-      <Togglable buttonLabel="create new blog">
-        <BlogForm />
-      </Togglable>
-
-      {sortedBlogs.map(blog =>
-        <Blog
-          key={blog.id}
-          blog={blog}
-          handleLikeClick={handleLikeClick}
-          user={user}
-        />
-      )}
-    </div>
+        <Switch>
+          <Route path="/users">
+            <Users users={users} />
+          </Route>
+          { /* remeber to put '/' path in the end */ }
+          <Route path="/">
+            <BlogList blogs={sortedBlogs} user={user} handleLikeClick={handleLikeClick} />
+          </Route>
+        </Switch>
+      </div>
+    </Router>
   )
 }
 
