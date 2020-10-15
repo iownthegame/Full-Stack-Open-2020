@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Switch, Route, useRouteMatch, Link } from 'react-router-dom'
-import Blog from './components/Blog'
+import Blog, { blogStyle } from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import Notification from './components/Notification'
@@ -14,19 +14,16 @@ import { initializeUsers } from './reducers/userReducer'
 
 import './App.css'
 
-const BlogList = ({ blogs, user, handleLikeClick }) => (
+const BlogList = ({ blogs }) => (
   <div>
     <Togglable buttonLabel="create new blog">
       <BlogForm />
     </Togglable>
 
     {blogs.map(blog =>
-      <Blog
-        key={blog.id}
-        blog={blog}
-        handleLikeClick={handleLikeClick}
-        user={user}
-      />
+      <div key={blog.id} style={blogStyle} >
+        <Link to={`/blogs/${blog.id}`}>{blog.title} {blog.author}</Link>
+      </div>
     )}
   </div>
 )
@@ -129,7 +126,8 @@ const App = () => {
       likes: blogObject.likes + 1,
       author: blogObject.author,
       title: blogObject.title,
-      url: blogObject.url
+      url: blogObject.url,
+      id: blogObject.id,
     }
 
     dispatch(updateBlog(blogObject.id, updateBlogObject))
@@ -163,8 +161,11 @@ const App = () => {
 
   const sortedBlogs = blogs.sort((a, b) => (a.likes > b.likes) ? -1 : 1)
 
-  const match = useRouteMatch('/users/:id')
-  const singleUser = match ? users.find(user => user.id === match.params.id) : null
+  const matchUser = useRouteMatch('/users/:id')
+  const singleUser = matchUser ? users.find(user => user.id === matchUser.params.id) : null
+
+  const matchBlog = useRouteMatch('/blogs/:id')
+  const singleBlog = matchBlog ? blogs.find(blog => blog.id === matchBlog.params.id) : null
 
   return (
     <div>
@@ -178,6 +179,13 @@ const App = () => {
         </Route>
         <Route path="/users">
           <Users users={users} />
+        </Route>
+        <Route path="/blogs/:id">
+          <Blog
+            blog={singleBlog}
+            handleLikeClick={handleLikeClick}
+            user={user}
+          />
         </Route>
         { /* remeber to put '/' path in the end */ }
         <Route path="/">
