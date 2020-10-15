@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
+import { Switch, Route, useRouteMatch, Link } from 'react-router-dom'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
@@ -44,7 +44,7 @@ const Users = ({ users }) => (
       <tbody>
         {users.map(user =>
           <tr key={user.id}>
-            <td>{user.name}</td>
+            <td><Link to={`/users/${user.id}`}>{user.name}</Link></td>
             <td>{user.blogs.length}</td>
           </tr>
         )}
@@ -52,6 +52,24 @@ const Users = ({ users }) => (
     </table>
   </div>
 )
+
+const User = ({ user }) => {
+  if (!user) {
+    return null
+  }
+
+  return (
+    <div>
+      <h2>{user.name}</h2>
+      <h3>added blogs</h3>
+      <ul>
+        {user.blogs.map(blog =>
+          <li key={blog.id}>{blog.title}</li>
+        )}
+      </ul>
+    </div>
+  )
+}
 
 const App = () => {
   const [username, setUsername] = useState('')
@@ -145,24 +163,28 @@ const App = () => {
 
   const sortedBlogs = blogs.sort((a, b) => (a.likes > b.likes) ? -1 : 1)
 
-  return (
-    <Router>
-      <div>
-        <h2>{user === null ? 'Log in to application' : 'blogs'}</h2>
-        <Notification />
-        {user === null ? loginForm() : <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>}
+  const match = useRouteMatch('/users/:id')
+  const singleUser = match ? users.find(user => user.id === match.params.id) : null
 
-        <Switch>
-          <Route path="/users">
-            <Users users={users} />
-          </Route>
-          { /* remeber to put '/' path in the end */ }
-          <Route path="/">
-            <BlogList blogs={sortedBlogs} user={user} handleLikeClick={handleLikeClick} />
-          </Route>
-        </Switch>
-      </div>
-    </Router>
+  return (
+    <div>
+      <h2>{user === null ? 'Log in to application' : 'blogs'}</h2>
+      <Notification />
+      {user === null ? loginForm() : <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>}
+
+      <Switch>
+        <Route path="/users/:id">
+          <User user={singleUser} />
+        </Route>
+        <Route path="/users">
+          <Users users={users} />
+        </Route>
+        { /* remeber to put '/' path in the end */ }
+        <Route path="/">
+          <BlogList blogs={sortedBlogs} user={user} handleLikeClick={handleLikeClick} />
+        </Route>
+      </Switch>
+    </div>
   )
 }
 
