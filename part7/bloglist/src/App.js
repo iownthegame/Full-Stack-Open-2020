@@ -14,41 +14,53 @@ import { initializeUsers } from './reducers/userReducer'
 
 import './App.css'
 
-const BlogList = ({ blogs }) => (
-  <div>
-    <Togglable buttonLabel="create new blog">
-      <BlogForm />
-    </Togglable>
+const BlogList = ({ blogs, user }) => {
+  if (!user) {
+    return null
+  }
 
-    {blogs.map(blog =>
-      <div key={blog.id} style={blogStyle} >
-        <Link to={`/blogs/${blog.id}`}>{blog.title} {blog.author}</Link>
-      </div>
-    )}
-  </div>
-)
+  return (
+    <div>
+      <Togglable buttonLabel="create new blog">
+        <BlogForm />
+      </Togglable>
 
-const Users = ({ users }) => (
-  <div>
-    <h2>Users</h2>
-    <table>
-      <thead>
-        <tr>
-          <th></th>
-          <th>blogs created</th>
-        </tr>
-      </thead>
-      <tbody>
-        {users.map(user =>
-          <tr key={user.id}>
-            <td><Link to={`/users/${user.id}`}>{user.name}</Link></td>
-            <td>{user.blogs.length}</td>
+      {blogs.map(blog =>
+        <div key={blog.id} style={blogStyle} >
+          <Link to={`/blogs/${blog.id}`}>{blog.title} {blog.author}</Link>
+        </div>
+      )}
+    </div>
+  )
+}
+
+const Users = ({ users, user }) => {
+  if (!user) {
+    return null
+  }
+
+  return (
+    <div>
+      <h2>Users</h2>
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>blogs created</th>
           </tr>
-        )}
-      </tbody>
-    </table>
-  </div>
-)
+        </thead>
+        <tbody>
+          {users.map(user =>
+            <tr key={user.id}>
+              <td><Link to={`/users/${user.id}`}>{user.name}</Link></td>
+              <td>{user.blogs.length}</td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  )
+}
 
 const User = ({ user }) => {
   if (!user) {
@@ -117,7 +129,7 @@ const App = () => {
 
   const handleLogout = () => {
     window.localStorage.removeItem('loggedBlogappUser')
-    dispatch(clearUser)
+    dispatch(clearUser())
   }
 
   const handleLikeClick = (blogObject) => {
@@ -167,18 +179,26 @@ const App = () => {
   const matchBlog = useRouteMatch('/blogs/:id')
   const singleBlog = matchBlog ? blogs.find(blog => blog.id === matchBlog.params.id) : null
 
+  const padding = { padding: 5 }
+
   return (
     <div>
-      <h2>{user === null ? 'Log in to application' : 'blogs'}</h2>
+      <div>
+        <Link style={padding} to="/">blogs</Link>
+        <Link style={padding} to="/users">users</Link>
+        {user && <span>{user.name} logged in <button onClick={handleLogout}>logout</button></span>}
+      </div>
+
+      <h2>blog app</h2>
       <Notification />
-      {user === null ? loginForm() : <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>}
+      {user === null && loginForm()}
 
       <Switch>
         <Route path="/users/:id">
           <User user={singleUser} />
         </Route>
         <Route path="/users">
-          <Users users={users} />
+          <Users users={users} user={user} />
         </Route>
         <Route path="/blogs/:id">
           <Blog
@@ -189,7 +209,7 @@ const App = () => {
         </Route>
         { /* remeber to put '/' path in the end */ }
         <Route path="/">
-          <BlogList blogs={sortedBlogs} user={user} handleLikeClick={handleLikeClick} />
+          <BlogList blogs={sortedBlogs} user={user} />
         </Route>
       </Switch>
     </div>
