@@ -10,6 +10,17 @@ export const blogStyle = {
   marginBottom: 5
 }
 
+const CommentLst = ({ comments }) => (
+  <div>
+    <h3>comments</h3>
+    <ul>
+      {comments.map(comment =>
+        <li key={comment.id}>{comment.content}</li>
+      )}
+    </ul>
+  </div>
+)
+
 const Blog = ({ blog, handleLikeClick, user }) => {
   const dispatch = useDispatch()
 
@@ -30,6 +41,8 @@ const Blog = ({ blog, handleLikeClick, user }) => {
       <div>likes {blog.likes} <button className="likeButton" onClick={() => handleLikeClick(blog)}>like</button></div>
       <div>added by {blog.user && blog.user.username}</div>
       {blog.user && user.username === blog.user.username && <button className="removeButton" onClick={() => onBlogDelete(blog)}>remove</button>}
+
+      <CommentLst comments={blog.comments} />
     </div>
   )
 }

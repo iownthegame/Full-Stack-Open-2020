@@ -140,6 +140,7 @@ const App = () => {
       title: blogObject.title,
       url: blogObject.url,
       id: blogObject.id,
+      comments: blogObject.comments,
     }
 
     dispatch(updateBlog(blogObject.id, updateBlogObject))
