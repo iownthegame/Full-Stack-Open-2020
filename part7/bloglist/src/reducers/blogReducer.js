@@ -35,6 +35,17 @@ export const createBlog = ({ title, author, url }) => {
   }
 }
 
+export const createBlogComment = (id, commentObject) => {
+  return async dispatch => {
+    const updateBlogObject = await blogService.createComment(id, commentObject)
+    dispatch({
+      type: 'UPDATE_BLOG',
+      id,
+      updateBlogObject
+    })
+  }
+}
+
 export const deleteBlog = (id) => {
   return async dispatch => {
     await blogService.remove(id)

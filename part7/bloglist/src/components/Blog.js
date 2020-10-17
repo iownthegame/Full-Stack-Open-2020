@@ -1,6 +1,6 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { deleteBlog } from '../reducers/blogReducer'
+import { deleteBlog, createBlogComment } from '../reducers/blogReducer'
 
 export const blogStyle = {
   paddingTop: 10,
@@ -10,16 +10,43 @@ export const blogStyle = {
   marginBottom: 5
 }
 
-const CommentLst = ({ comments }) => (
-  <div>
-    <h3>comments</h3>
-    <ul>
-      {comments.map(comment =>
-        <li key={comment.id}>{comment.content}</li>
-      )}
-    </ul>
-  </div>
-)
+const CommentLst = ({ comments, id }) => {
+  const dispatch = useDispatch()
+  const [content, setContent] = useState('')
+
+  const handleCreateComment = async (event) => {
+    event.preventDefault()
+
+    const commentObject = { content }
+    dispatch(createBlogComment(id, commentObject))
+    setContent('')
+  }
+
+  return (
+    <div>
+      <h3>comments</h3>
+
+      <form onSubmit={handleCreateComment}>
+        <div>
+          <input
+            id="content"
+            type="text"
+            value={content}
+            name="content"
+            onChange={({ target }) => setContent(target.value)}
+          />
+          <button id="create-button" type="submit">add comment</button>
+        </div>
+      </form>
+
+      <ul>
+        {comments.map(comment =>
+          <li key={comment.id}>{comment.content}</li>
+        )}
+      </ul>
+    </div>
+  )
+}
 
 const Blog = ({ blog, handleLikeClick, user }) => {
   const dispatch = useDispatch()
@@ -42,7 +69,7 @@ const Blog = ({ blog, handleLikeClick, user }) => {
       <div>added by {blog.user && blog.user.username}</div>
       {blog.user && user.username === blog.user.username && <button className="removeButton" onClick={() => onBlogDelete(blog)}>remove</button>}
 
-      <CommentLst comments={blog.comments} />
+      <CommentLst comments={blog.comments} id={blog.id} />
     </div>
   )
 }
