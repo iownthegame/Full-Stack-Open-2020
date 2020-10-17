@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Switch, Route, useRouteMatch } from 'react-router-dom'
+import Container from '@material-ui/core/Container'
+
 import Blog from './components/Blog'
 import BlogList from './components/BlogList'
 import LoginForm from './components/LoginForm'
@@ -42,7 +44,7 @@ const App = () => {
   }, [dispatch])
 
   return (
-    <div>
+    <Container>
       <Menu user={user} />
 
       <h2>blog app</h2>
@@ -64,7 +66,7 @@ const App = () => {
           <BlogList />
         </Route>
       </Switch>
-    </div>
+    </Container>
   )
 }
 

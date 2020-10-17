@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
+import { Button, TextField } from '@material-ui/core'
 
 import { createBlog } from '../reducers/blogReducer'
 
@@ -22,8 +23,8 @@ const BlogForm = () => {
   return (
     <form onSubmit={handleCreateBlog}>
       <div>
-        title:
-        <input
+        <TextField
+          label="title"
           id="title"
           type="text"
           value={title}
@@ -32,8 +33,8 @@ const BlogForm = () => {
         />
       </div>
       <div>
-        author:
-        <input
+        <TextField
+          label="author"
           id="author"
           type="text"
           value={author}
@@ -42,8 +43,8 @@ const BlogForm = () => {
         />
       </div>
       <div>
-        url:
-        <input
+        <TextField
+          label="url"
           id="url"
           type="text"
           value={url}
@@ -51,7 +52,7 @@ const BlogForm = () => {
           onChange={({ target }) => setUrl(target.value)}
         />
       </div>
-      <button id="create-button" type="submit">create</button>
+      <Button variant="contained" color="primary" id="create-button" type="submit">create</Button>
     </form>
   )
 }
