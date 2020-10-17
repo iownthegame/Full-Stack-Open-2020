@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import { useDispatch } from 'react-redux'
-import { deleteBlog, createBlogComment } from '../reducers/blogReducer'
+import { useDispatch, useSelector } from 'react-redux'
+import { deleteBlog, createBlogComment, updateBlog } from '../reducers/blogReducer'
 
 export const blogStyle = {
   paddingTop: 10,
@@ -48,10 +48,25 @@ const CommentLst = ({ comments, id }) => {
   )
 }
 
-const Blog = ({ blog, handleLikeClick, user }) => {
+const Blog = ({ blog }) => {
   const dispatch = useDispatch()
+  const user = useSelector(state => state.user)
 
-  const onBlogDelete = (blogObject) => {
+  const handleLikeClick = (blogObject) => {
+    const updateBlogObject = {
+      user: blogObject.user.id,
+      likes: blogObject.likes + 1,
+      author: blogObject.author,
+      title: blogObject.title,
+      url: blogObject.url,
+      id: blogObject.id,
+      comments: blogObject.comments,
+    }
+
+    dispatch(updateBlog(blogObject.id, updateBlogObject))
+  }
+
+  const handleBlogDelete = (blogObject) => {
     if (!window.confirm(`Remove blog ${blogObject.title}`)) return
 
     dispatch(deleteBlog(blogObject.id))
@@ -67,7 +82,7 @@ const Blog = ({ blog, handleLikeClick, user }) => {
       <div><a href={blog.url}>{blog.url}</a></div>
       <div>likes {blog.likes} <button className="likeButton" onClick={() => handleLikeClick(blog)}>like</button></div>
       <div>added by {blog.user && blog.user.username}</div>
-      {blog.user && user.username === blog.user.username && <button className="removeButton" onClick={() => onBlogDelete(blog)}>remove</button>}
+      {blog.user && user.username === blog.user.username && <button className="removeButton" onClick={() => handleBlogDelete(blog)}>remove</button>}
 
       <CommentLst comments={blog.comments} id={blog.id} />
     </div>
