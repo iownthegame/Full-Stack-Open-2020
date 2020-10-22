@@ -80,6 +80,7 @@ const typeDefs = gql`
 
   type Subscription {
     bookAdded: Book!
+    authorAdded: Author!
   }
 `
 
@@ -120,6 +121,8 @@ const resolvers = {
             invalidArgs: args,
           })
         }
+
+        pubsub.publish('AUTHOR_ADDED', { authorAdded: author })
       }
 
       const book = new Book({
@@ -186,6 +189,9 @@ const resolvers = {
   Subscription: {
     bookAdded: {
       subscribe: () => pubsub.asyncIterator(['BOOK_ADDED'])
+    },
+    authorAdded: {
+      subscribe: () => pubsub.asyncIterator(['AUTHOR_ADDED'])
     },
   },
 }
