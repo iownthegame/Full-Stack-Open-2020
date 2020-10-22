@@ -6,7 +6,7 @@ import Books from './components/Books'
 import NewBook from './components/NewBook'
 import Recommend from './components/Recommend'
 import Login from './components/Login'
-import { BOOK_ADDED } from './queries'
+import { ALL_BOOKS, BOOK_ADDED, ALL_AUTHORS, AUTHOR_ADDED } from './queries'
 
 const App = () => {
   const [page, setPage] = useState('authors')
@@ -25,10 +25,45 @@ const App = () => {
     setToken(tokenFromStorage)
   }, [])
 
+  const updateCacheWithBook = (addedBook) => {
+    const includedIn = (set, object) =>
+      set.map(p => p.id).includes(object.id)
+
+    const dataInStore = client.readQuery({ query: ALL_BOOKS })
+    if (!includedIn(dataInStore.allBooks, addedBook)) {
+      client.writeQuery({
+        query: ALL_BOOKS,
+        data: { allBooks : dataInStore.allBooks.concat(addedBook) }
+      })
+    }
+  }
+
+  const updateCacheWithAuthor = (addedAuthor) => {
+    const includedIn = (set, object) =>
+      set.map(p => p.id).includes(object.id)
+
+    const dataInStore = client.readQuery({ query: ALL_AUTHORS })
+    if (!includedIn(dataInStore.allAuthors, addedAuthor)) {
+      client.writeQuery({
+        query: ALL_AUTHORS,
+        data: { allAuthors : dataInStore.allAuthors.concat(addedAuthor) }
+      })
+    }
+  }
+
   useSubscription(BOOK_ADDED, {
     onSubscriptionData: ({ subscriptionData }) => {
       const addedBook = subscriptionData.data.bookAdded
-      window.alert(`new book ${addedBook.title} is added`)
+      console.log(`new book ${addedBook.title} is added`)
+      updateCacheWithBook(addedBook)
+    }
+  })
+
+  useSubscription(AUTHOR_ADDED, {
+    onSubscriptionData: ({ subscriptionData }) => {
+      const addedAuthor = subscriptionData.data.authorAdded
+      console.log(`new author ${addedAuthor.name} is added`)
+      updateCacheWithAuthor(addedAuthor)
     }
   })
 
@@ -60,6 +95,8 @@ const App = () => {
 
       <NewBook
         show={page === 'add'}
+        updateCacheWithBook={updateCacheWithBook}
+        updateCacheWithAuthor={updateCacheWithAuthor}
       />
 
       <Recommend

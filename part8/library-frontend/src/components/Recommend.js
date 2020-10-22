@@ -11,13 +11,10 @@ const Recommend = ({ show, token }) => {
   const [getBooks, booksResult] = useLazyQuery(ALL_BOOKS)
 
   useEffect(() => {
-    console.log('in usereffect')
-    console.log(token)
     getUser()
   }, [token, getUser])  // eslint-disable-line
 
   useEffect(() => {
-    console.log('userResult', userResult.data)
     if (userResult.data) {
       const user = userResult.data.me
       setUser(user)
