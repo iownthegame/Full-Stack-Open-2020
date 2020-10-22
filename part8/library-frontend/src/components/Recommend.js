@@ -1,31 +1,45 @@
 import React, { useState, useEffect } from 'react'
-import { useQuery } from '@apollo/client'
+import { useLazyQuery } from '@apollo/client'
 import { ALL_BOOKS, ME } from '../queries'
 import BookTable from './BookTable'
 
 const Recommend = ({ show, token }) => {
   const [user, setUser] = useState('')
+  const [books, setBooks] = useState([])
 
-  const result = useQuery(ALL_BOOKS)
-  const userResult = useQuery(ME)
+  const [getUser, userResult] = useLazyQuery(ME)
+  const [getBooks, booksResult] = useLazyQuery(ALL_BOOKS)
 
   useEffect(() => {
-    if ( userResult.data ) {
+    console.log('in usereffect')
+    console.log(token)
+    getUser()
+  }, [token, getUser])  // eslint-disable-line
+
+  useEffect(() => {
+    console.log('userResult', userResult.data)
+    if (userResult.data) {
       const user = userResult.data.me
       setUser(user)
+      if (user) {
+        getBooks({ variables: { genre: user.favoriteGenre } })
+      }
     }
-  }, [userResult.data, token]) // eslint-disable-line
+  }, [userResult, getBooks])
+
+  useEffect(() => {
+    if (booksResult.data) {
+      setBooks(booksResult.data.allBooks)
+    }
+  }, [booksResult])
 
   if (!show || !token || !user) {
     return null
   }
 
-  if (result.loading || userResult.loading)  {
+  if (booksResult.loading || userResult.loading)  {
     return <div>loading...</div>
   }
-
-  let books = result.data.allBooks
-  books = books.filter(book => book.genres.includes(user.favoriteGenre))
 
   return (
     <div>

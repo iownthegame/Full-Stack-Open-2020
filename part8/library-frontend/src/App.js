@@ -20,8 +20,8 @@ const App = () => {
   }
 
   useEffect(() => {
-    const token = localStorage.getItem('library-user-token')
-    setToken(token)
+    const tokenFromStorage = localStorage.getItem('library-user-token')
+    setToken(tokenFromStorage)
   }, [])
 
   return (
