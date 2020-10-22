@@ -82,7 +82,7 @@ const resolvers = {
     authorCount: () => Author.collection.countDocuments(),
     allBooks: (root, args) => {
       if (args.genre) {
-        return Book.find({ genres: { $in: [ args.genre ] } })
+        return Book.find({ genres: { $in: [ args.genre ] } }).populate('author')
       }
       return Book.find({}).populate('author')
     },
