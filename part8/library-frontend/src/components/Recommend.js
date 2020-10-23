@@ -30,12 +30,9 @@ const Recommend = ({ show, token }) => {
     }
   }, [booksResult])
 
-  if (!show || !token || !user) {
-    return null
-  }
 
-  if (booksResult.loading || userResult.loading)  {
-    return <div>loading...</div>
+  if (!show || !user) {
+    return null
   }
 
   return (

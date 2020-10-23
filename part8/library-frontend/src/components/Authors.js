@@ -4,15 +4,13 @@ import { useQuery, useMutation } from '@apollo/client';
 import Select from 'react-select';
 import { ALL_AUTHORS, EDIT_AUTHOR } from '../queries'
 
-const Authors = (props) => {
-  const [nameOption, setNameOption] = useState(null)
+const SetBirthyear = ({ authors }) => {
   const [born, setBorn] = useState('')
+  const [nameOption, setNameOption] = useState(null)
 
   const [ editAuthor ] = useMutation(EDIT_AUTHOR)
 
-  const result = useQuery(ALL_AUTHORS)
-
-  if (!props.show) {
+  if (authors.length === 0) {
     return null
   }
 
@@ -25,8 +23,35 @@ const Authors = (props) => {
     setBorn('')
   }
 
-  if (result.loading)  {
-    return <div>loading...</div>
+  return (
+    <>
+      <h3>Set birthyear</h3>
+      <form onSubmit={submit}>
+        <div>
+          <Select
+            value={nameOption}
+            onChange={(selectedOption) => setNameOption(selectedOption)}
+            options={authors.map(author => { return { value: author.name, label: author.name } })}
+          />
+        </div>
+        <div>
+          born
+          <input
+            value={born}
+            onChange={({ target }) => setBorn(target.value)}
+          />
+        </div>
+        <button type='submit'>update author</button>
+      </form>
+    </>
+  )
+}
+
+const Authors = (props) => {
+  const result = useQuery(ALL_AUTHORS)
+
+  if (!props.show || !result.data) {
+    return null
   }
 
   const authors = result.data.allAuthors
@@ -55,28 +80,7 @@ const Authors = (props) => {
         </tbody>
       </table>
 
-      {props.token &&
-        <>
-          <h3>Set birthyear</h3>
-          <form onSubmit={submit}>
-            <div>
-              <Select
-                value={nameOption}
-                onChange={(selectedOption) => setNameOption(selectedOption)}
-                options={authors.map(author => { return { value: author.name, label: author.name } })}
-              />
-            </div>
-            <div>
-              born
-              <input
-                value={born}
-                onChange={({ target }) => setBorn(target.value)}
-              />
-            </div>
-            <button type='submit'>update author</button>
-          </form>
-        </>
-      }
+      {props.token && <SetBirthyear authors={authors.filter(author => !author.born)} />}
     </div>
   )
 }
