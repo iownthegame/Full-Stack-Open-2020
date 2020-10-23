@@ -11,15 +11,17 @@ const Recommend = ({ show, token }) => {
   const [getBooks, booksResult] = useLazyQuery(ALL_BOOKS)
 
   useEffect(() => {
-    getUser()
-  }, [token, getUser])  // eslint-disable-line
+    if (token) {
+      getUser()
+    }
+  }, [token])  // eslint-disable-line
 
   useEffect(() => {
     if (userResult.data) {
-      const user = userResult.data.me
-      setUser(user)
-      if (user) {
-        getBooks({ variables: { genre: user.favoriteGenre } })
+      const currentUser = userResult.data.me
+      if (currentUser) {
+        setUser(currentUser)
+        getBooks({ variables: { genre: currentUser.favoriteGenre } })
       }
     }
   }, [userResult, getBooks])
