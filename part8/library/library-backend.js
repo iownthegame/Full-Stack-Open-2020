@@ -2,6 +2,8 @@ const { ApolloServer, UserInputError, gql, AuthenticationError } = require('apol
 const { PubSub } = require('apollo-server')
 const pubsub = new PubSub()
 
+const DataLoader = require('dataloader')
+
 const jwt = require('jsonwebtoken')
 
 const JWT_SECRET = 'NEED_HERE_A_SECRET_KEY'
@@ -83,6 +85,10 @@ const typeDefs = gql`
     authorAdded: Author!
   }
 `
+const batchBookCount = async (keys) => {
+  const books = await Book.find({}).populate('author')
+  return keys.map(key => books.filter(book => book.author.id === key).length);
+};
 
 const resolvers = {
   Query: {
@@ -100,8 +106,8 @@ const resolvers = {
     }
   },
   Author: {
-    bookCount: (root) => {
-      return Book.count({ author: root })
+    bookCount: async (root, args, { loaders }) => {
+      return await loaders.bookCount.load(root.id)
     }
   },
   Mutation: {
@@ -206,7 +212,12 @@ const server = new ApolloServer({
         auth.substring(7), JWT_SECRET
       )
       const currentUser = await User.findById(decodedToken.id)
-      return { currentUser }
+      return {
+        currentUser,
+        loaders: {
+          bookCount: new DataLoader(keys => batchBookCount(keys))
+        }
+      }
     }
   }
 })
