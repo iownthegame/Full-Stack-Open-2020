@@ -90,6 +90,8 @@ const batchBookCount = async (keys) => {
   return keys.map(key => books.filter(book => book.author.id === key).length);
 };
 
+const bookCountLoader = new DataLoader(keys => batchBookCount(keys))
+
 const resolvers = {
   Query: {
     bookCount: () => Book.collection.countDocuments(),
@@ -107,7 +109,8 @@ const resolvers = {
   },
   Author: {
     bookCount: async (root, args, { loaders }) => {
-      return await loaders.bookCount.load(root.id)
+      // return await loaders.bookCount.load(root.id)
+      return await bookCountLoader.load(root.id)
     }
   },
   Mutation: {
@@ -214,9 +217,9 @@ const server = new ApolloServer({
       const currentUser = await User.findById(decodedToken.id)
       return {
         currentUser,
-        loaders: {
-          bookCount: new DataLoader(keys => batchBookCount(keys))
-        }
+        // loaders: {
+        //   bookCount: new DataLoader(keys => batchBookCount(keys))
+        // }
       }
     }
   }
