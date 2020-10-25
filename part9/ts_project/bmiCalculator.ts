@@ -18,7 +18,11 @@ function calculateBmi(height: number, weight: number) {
   else
     res = "Obese Class III (Very severely obese)"
 
-  return res
+  console.log(res)
 }
 
-console.log(calculateBmi(180, 74))
+// console.log(calculateBmi(180, 74))
+
+const height: number = Number(process.argv[2])
+const weight: number = Number(process.argv[3])
+calculateBmi(height, weight)
