@@ -1,4 +1,9 @@
 interface ExerciseValues {
+  exercises: Array<number>,
+  target: number
+}
+
+interface ResExerciseValues {
   periodLength: number,
   trainingDays: number,
   success: boolean,
@@ -8,7 +13,7 @@ interface ExerciseValues {
   average: number
 }
 
-const calculateExercises = (exercises: Array<number>, target: number): ExerciseValues => {
+const calculateExercises = (exercises: Array<number>, target: number): ResExerciseValues => {
   const total = exercises.reduce((a, b) => a + b, 0)
   const avg = total / exercises.length
 
@@ -21,7 +26,7 @@ const calculateExercises = (exercises: Array<number>, target: number): ExerciseV
     ratingDescription = 'not too bad but could be better'
   }
 
-  return {
+  const res = {
     periodLength: exercises.length,
     trainingDays: exercises.filter(ex => ex > 0).length,
     success: avg >= target,
@@ -30,6 +35,30 @@ const calculateExercises = (exercises: Array<number>, target: number): ExerciseV
     target: target,
     average: avg
   }
+  console.log(res)
+  return res
 }
 
-console.log(calculateExercises([3, 0, 2, 4.5, 0, 3, 1], 2))
+// console.log(calculateExercises([3, 0, 2, 4.5, 0, 3, 1], 2))
+
+const parseArguments = (args: Array<string>): ExerciseValues => {
+  if (args.length < 4) throw new Error('Not enough arguments');
+
+  for (let i = 2; i < args.length; i++) {
+    if (isNaN(Number(args[i]))) {
+      throw new Error('Provided values were not numbers!');
+    }
+  }
+
+  return {
+    exercises: args.slice(3).map(ex => Number(ex)),
+    target: Number(args[2])
+  }
+}
+
+try {
+  const { exercises, target } = parseArguments(process.argv);
+  calculateExercises(exercises, target)
+} catch (e) {
+  console.log('Error, something bad happened, message: ', e.message);
+}
