@@ -14,16 +14,16 @@ interface ResExerciseValues {
 }
 
 const calculateExercises = (exercises: Array<number>, target: number): ResExerciseValues => {
-  const total = exercises.reduce((a, b) => a + b, 0)
-  const avg = total / exercises.length
+  const total = exercises.reduce((a, b) => a + b, 0);
+  const avg = total / exercises.length;
 
-  let rating = 1, ratingDescription = 'could be better'
+  let rating = 1, ratingDescription = 'could be better';
   if (avg >= 2) {
-    rating = 3
-    ratingDescription = 'good'
+    rating = 3;
+    ratingDescription = 'good';
   } else if (avg >= 1) {
-    rating = 2
-    ratingDescription = 'not too bad but could be better'
+    rating = 2;
+    ratingDescription = 'not too bad but could be better';
   }
 
   const res = {
@@ -34,10 +34,10 @@ const calculateExercises = (exercises: Array<number>, target: number): ResExerci
     ratingDescription: ratingDescription,
     target: target,
     average: avg
-  }
-  console.log(res)
-  return res
-}
+  };
+  console.log(res);
+  return res;
+};
 
 // console.log(calculateExercises([3, 0, 2, 4.5, 0, 3, 1], 2))
 
@@ -53,12 +53,13 @@ const parseArguments = (args: Array<string>): ExerciseValues => {
   return {
     exercises: args.slice(3).map(ex => Number(ex)),
     target: Number(args[2])
-  }
-}
+  };
+};
 
 try {
   const { exercises, target } = parseArguments(process.argv);
-  calculateExercises(exercises, target)
+  calculateExercises(exercises, target);
 } catch (e) {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   console.log('Error, something bad happened, message: ', e.message);
 }
