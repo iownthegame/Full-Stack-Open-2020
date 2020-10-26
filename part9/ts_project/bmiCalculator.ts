@@ -1,4 +1,4 @@
-function calculateBmi(height: number, weight: number) {
+export function calculateBmi(height: number, weight: number) {
   const BMI = weight / ((height / 100) * (height / 100))
   let res
   if (BMI < 15)
@@ -19,6 +19,7 @@ function calculateBmi(height: number, weight: number) {
     res = "Obese Class III (Very severely obese)"
 
   console.log(res)
+  return res
 }
 
 // console.log(calculateBmi(180, 74))
