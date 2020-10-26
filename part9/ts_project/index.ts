@@ -1,7 +1,9 @@
 import express from 'express';
 import { calculateBmi } from './bmiCalculator';
+import { calculateExercises } from './exerciseCalculator';
 
 const app = express();
+app.use(express.json());
 
 app.get('/hello', (_req, res) => {
   res.send('Hello Full Stack!');
@@ -19,6 +21,20 @@ app.get('/bmi', (req, res) => {
     weight,
     height,
     bmi: calculateBmi(Number(height), Number(weight))
+  });
+});
+
+app.post('/exercises', (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const { target, daily_exercises } = req.body;
+  if (!daily_exercises || !target) {
+    res.json({
+      error: "parameters missing"
+    });
+  }
+
+  res.json({...
+    calculateExercises(daily_exercises, Number(target))
   });
 });
 

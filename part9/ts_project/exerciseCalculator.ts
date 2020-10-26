@@ -13,7 +13,7 @@ interface ResExerciseValues {
   average: number
 }
 
-const calculateExercises = (exercises: Array<number>, target: number): ResExerciseValues => {
+export function calculateExercises(exercises: Array<number>, target: number): ResExerciseValues {
   const total = exercises.reduce((a, b) => a + b, 0);
   const avg = total / exercises.length;
 
@@ -37,7 +37,7 @@ const calculateExercises = (exercises: Array<number>, target: number): ResExerci
   };
   console.log(res);
   return res;
-};
+}
 
 // console.log(calculateExercises([3, 0, 2, 4.5, 0, 3, 1], 2))
 
