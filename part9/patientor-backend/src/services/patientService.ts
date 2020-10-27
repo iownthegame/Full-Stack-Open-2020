@@ -1,5 +1,5 @@
 import patientData from '../../data/patients.json';
-import { PatientEntry, NonSensitivePatientEntry } from '../types';
+import { PatientEntry, NonSensitivePatientEntry, NewPatientEntry } from '../types';
 
 const patients: Array<PatientEntry> = patientData as Array<PatientEntry>;
 
@@ -17,8 +17,19 @@ const getNonSensitiveEntries = () : NonSensitivePatientEntry [] => {
   }));
 };
 
+const addPatient = ( entry: NewPatientEntry): PatientEntry => {
+  const newPatientEntry = {
+    id: (patients.length + 1).toString(),
+    ...entry
+  };
+
+  patients.push(newPatientEntry);
+  return newPatientEntry;
+};
+
 export default {
   getEntries,
-  getNonSensitiveEntries
+  getNonSensitiveEntries,
+  addPatient
 };
 
