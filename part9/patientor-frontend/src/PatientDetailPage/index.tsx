@@ -4,7 +4,7 @@ import { useRouteMatch, useParams } from "react-router-dom";
 import { Icon } from 'semantic-ui-react';
 
 import { apiBaseUrl } from "../constants";
-import { useStateValue } from "../state";
+import { useStateValue, setPatient } from "../state";
 import { Patient } from "../types";
 
 const PatientDetailPage: React.FC = () => {
@@ -26,7 +26,7 @@ const PatientDetailPage: React.FC = () => {
         const { data: patientFromApi } = await axios.get<Patient>(
           `${apiBaseUrl}/patients/${id}`
         );
-        dispatch({ type: "SET_PATIENT", payload: patientFromApi });
+        dispatch(setPatient(patientFromApi));
       } catch (e) {
         console.error(e);
       }
