@@ -1,11 +1,64 @@
 import React from "react";
 import axios from "axios";
 import { useRouteMatch, useParams } from "react-router-dom";
-import { Icon } from 'semantic-ui-react';
+import { Icon, Card } from 'semantic-ui-react';
 
 import { apiBaseUrl } from "../constants";
 import { useStateValue, setPatient } from "../state";
-import { Patient } from "../types";
+import { Patient, Entry, HealthCheckRating } from "../types";
+
+const HospitalEntry: React.FC<{ entry: Entry }> = ({ entry }) => {
+  return (
+    <Card fluid
+      header={<>{entry.date} <Icon name="hospital" /></>}
+      meta={<p><i>{entry.description}</i></p>}
+    />
+  );
+};
+
+const OccupationalHealthcareEntry: React.FC<{ entry: Entry; employerName: string }> = ({ entry, employerName }) => {
+  return (
+    <Card fluid
+      header={<>{entry.date} <Icon name="stethoscope" /> {employerName}</>}
+      meta={<p><i>{entry.description}</i></p>}
+    />
+  );
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const getHealthCheckRatingColor = (rating: HealthCheckRating): any => {
+  const map = ["green", "yellow", "orange", "red"];
+  return map[rating];
+};
+
+const HealthCheckEntry: React.FC<{ entry: Entry; healthCheckRating:  HealthCheckRating }> = ({ entry, healthCheckRating }) => {
+  return (
+    <Card fluid
+      header={<>{entry.date} <Icon name="doctor" /></>}
+      meta={<p><i>{entry.description}</i></p>}
+      description={<Icon name="heart" color={getHealthCheckRatingColor(healthCheckRating)} />}
+    />
+  );
+};
+
+const assertNever = (value: never): never => {
+  throw new Error(
+    `Unhandled discriminated union member: ${JSON.stringify(value)}`
+  );
+};
+
+const EntryDetails: React.FC<{ entry: Entry }> = ({ entry }) => {
+  switch(entry.type) {
+    case "Hospital":
+      return <HospitalEntry entry={entry} />;
+    case "OccupationalHealthcare":
+      return <OccupationalHealthcareEntry entry={entry} employerName={entry.employerName} />;
+    case "HealthCheck":
+      return <HealthCheckEntry entry={entry} healthCheckRating={entry.healthCheckRating} />;
+    default:
+      return assertNever(entry);
+  }
+};
 
 const PatientDetailPage: React.FC = () => {
   const [{ patient, diagnoses }, dispatch] = useStateValue();
@@ -48,18 +101,19 @@ const PatientDetailPage: React.FC = () => {
       <p>{`occupation: ${patient.occupation}`}</p>
 
       <h2>entries</h2>
+      <Card.Group>
       {patient.entries.map(entry => {
         return (
-          <div key={entry.id}>
-            <p>{entry.date} <i>{entry.description}</i></p>
-            <ul>
-              {entry.diagnosisCodes?.map(code =>
-                <li key={code}>{code} {diagnoses && diagnoses[code] && diagnoses[code].name}</li>
-              )}
-            </ul>
-          </div>
+          <EntryDetails key={entry.id} entry={entry} />
+          // <p>{entry.date} <i>{entry.description}</i></p>
+          // <ul>
+          //   {entry.diagnosisCodes?.map(code =>
+          //     <li key={code}>{code} {diagnoses && diagnoses[code] && diagnoses[code].name}</li>
+          //   )}
+          // </ul>
         );
       })}
+      </Card.Group>
     </>
   );
 };
