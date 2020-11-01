@@ -8,7 +8,7 @@ import { useStateValue, setPatient } from "../state";
 import { Patient } from "../types";
 
 const PatientDetailPage: React.FC = () => {
-  const [{ patient }, dispatch] = useStateValue();
+  const [{ patient, diagnoses }, dispatch] = useStateValue();
 
   const match = useRouteMatch('/patients/:id');
   const { id } = useParams<{ id: string }>();
@@ -50,14 +50,14 @@ const PatientDetailPage: React.FC = () => {
       <h2>entries</h2>
       {patient.entries.map(entry => {
         return (
-          <>
+          <div key={entry.id}>
             <p>{entry.date} <i>{entry.description}</i></p>
             <ul>
               {entry.diagnosisCodes?.map(code =>
-                <li key={code}>{code}</li>
+                <li key={code}>{code} {diagnoses && diagnoses[code] && diagnoses[code].name}</li>
               )}
             </ul>
-          </>
+          </div>
         );
       })}
     </>
