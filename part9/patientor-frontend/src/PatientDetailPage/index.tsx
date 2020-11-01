@@ -46,6 +46,20 @@ const PatientDetailPage: React.FC = () => {
       <h1>{patient.name} <Icon name={getGenderIconName(patient.gender)} /></h1>
       <p>{`ssn: ${patient.ssn}`}</p>
       <p>{`occupation: ${patient.occupation}`}</p>
+
+      <h2>entries</h2>
+      {patient.entries.map(entry => {
+        return (
+          <>
+            <p>{entry.date} <i>{entry.description}</i></p>
+            <ul>
+              {entry.diagnosisCodes?.map(code =>
+                <li key={code}>{code}</li>
+              )}
+            </ul>
+          </>
+        );
+      })}
     </>
   );
 };
