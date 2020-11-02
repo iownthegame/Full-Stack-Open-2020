@@ -1,4 +1,4 @@
-import { NewPatientEntry, Gender } from './types';
+import { NewPatientEntry, Gender, NewBaseEntry } from './types';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -11,6 +11,17 @@ const toNewPatientEntry = (object: any): NewPatientEntry => {
     occupation: parseString(object.occupation, 'occupation'),
     dateOfBirth: parseDate(object.dateOfBirth),
     gender: parseGender(object.gender),
+  };
+  /* eslint-enable @typescript-eslint/no-unsafe-member-access */
+};
+
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+export const toNewEntry = (object: any): NewBaseEntry => {
+  /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+  return {
+    description: parseString(object.description, 'description'),
+    date: parseDate(object.date),
+    specialist: parseString(object.specialist, 'specialist')
   };
   /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 };
