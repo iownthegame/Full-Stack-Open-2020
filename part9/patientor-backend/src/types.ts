@@ -26,15 +26,14 @@ export interface Patient {
 
 export type PublicPatient = Omit<Patient, 'ssn' | 'entries' >;
 
-export interface BaseEntry {
+interface BaseEntry {
   id: string;
   description: string;
   date: string;
   specialist: string;
   diagnosisCodes?: Array<DiagnoseEntry['code']>;
+  type: string;
 }
-
-export type NewBaseEntry = Omit<BaseEntry, 'id'>;
 
 export enum HealthCheckRating {
   "Healthy" = 0,
@@ -69,3 +68,12 @@ export type Entry =
   | HospitalEntry
   | OccupationalHealthcareEntry
   | HealthCheckEntry;
+
+export type NewEntry = Omit<Entry, 'id'>;
+export type NewHealthCheckEntry = Omit<HealthCheckEntry, 'id'>;
+
+export enum EntryType {
+  Hospital = "Hospital",
+  OccupationalHealthcare = "OccupationalHealthcare",
+  HealthCheck = "HealthCheck"
+}

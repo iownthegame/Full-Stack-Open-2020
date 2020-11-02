@@ -1,5 +1,5 @@
 import patientData from '../../data/patients';
-import { Patient, NonSensitivePatientEntry, NewPatientEntry, Entry, NewBaseEntry, BaseEntry } from '../types';
+import { Patient, NonSensitivePatientEntry, NewPatientEntry, Entry, NewEntry } from '../types';
 
 const patients: Array<Patient> = patientData;
 
@@ -34,7 +34,7 @@ const addPatient = ( entry: NewPatientEntry): Patient => {
   return newPatientEntry;
 };
 
-const addEntryToPatient = (id: string, entry: NewBaseEntry): BaseEntry | undefined => {
+const addEntryToPatient = (id: string, entry: NewEntry): Entry | undefined => {
   const patient = patients.find(patient => patient.id === id);
   if(!patient) {
     return undefined;

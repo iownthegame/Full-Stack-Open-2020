@@ -1,4 +1,4 @@
-import { NewPatientEntry, Gender, NewBaseEntry } from './types';
+import { NewPatientEntry, Gender, NewEntry, EntryType, HealthCheckRating, NewHealthCheckEntry } from './types';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -16,14 +16,28 @@ const toNewPatientEntry = (object: any): NewPatientEntry => {
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const toNewEntry = (object: any): NewBaseEntry => {
+export const toNewEntry = (object: any): NewEntry => {
   /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-  return {
+  if (object.type == 'HealthCheck') {
+    const newEntry: NewHealthCheckEntry = {
+      description: parseString(object.description, 'description'),
+      date: parseDate(object.date),
+      specialist: parseString(object.specialist, 'specialist'),
+      type: 'HealthCheck',
+      healthCheckRating: parseHealthCheckRating(object.healthCheckRating)
+    };
+    return newEntry;
+  }
+
+  const newEntry: NewEntry = {
     description: parseString(object.description, 'description'),
     date: parseDate(object.date),
-    specialist: parseString(object.specialist, 'specialist')
+    specialist: parseString(object.specialist, 'specialist'),
+    type: parseEntryType(object.type),
   };
+
   /* eslint-enable @typescript-eslint/no-unsafe-member-access */
+  return newEntry;
 };
 
 const isString = (text: any): text is string => {
@@ -59,5 +73,33 @@ const parseGender = (gender: any): Gender => {
   }
   return gender;
 };
+
+const isEntryType = (param: any): param is EntryType => {
+  return Object.values(EntryType).includes(param);
+};
+
+const parseEntryType = (type: any): EntryType => {
+  if  (!type || !isEntryType(type)) {
+    throw new Error(`Incorrect or missing visibility: ${type as string}`);
+  }
+  return type;
+};
+
+const isHealthCheckRating = (param: any): param is HealthCheckRating => {
+  return Object.values(HealthCheckRating).includes(param);
+};
+
+const parseHealthCheckRating = (healthCheckRating: any): HealthCheckRating => {
+  if (!isHealthCheckRating(healthCheckRating)) {
+    throw new Error(`Incorrect or missing visibility: ${healthCheckRating as string}`);
+  }
+  return healthCheckRating;
+};
+
+// const parseDiagnosisCodes = (diagnosisCodes: any): Array<string> => {
+//   if(!diagnosisCodes)
+//     return [];
+//   return diagnosisCodes.map(code => parseString(code, 'diagnosisCodes'));
+// };
 
 export default toNewPatientEntry;
