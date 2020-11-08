@@ -1,10 +1,13 @@
 import React from "react";
 import axios from "axios";
 import { useRouteMatch, useParams } from "react-router-dom";
-import { Icon, Card } from 'semantic-ui-react';
+import { Icon, Card, Button } from 'semantic-ui-react';
+
+import { EntryFormValues } from "../AddEntryModal/AddEntryForm";
+import AddEntryModal from "../AddEntryModal";
 
 import { apiBaseUrl } from "../constants";
-import { useStateValue, setPatient } from "../state";
+import { useStateValue, setPatient, addEntryToPatient } from "../state";
 import { Patient, Entry, HealthCheckRating } from "../types";
 
 const HospitalEntry: React.FC<{ entry: Entry }> = ({ entry }) => {
@@ -43,7 +46,7 @@ const HealthCheckEntry: React.FC<{ entry: Entry; healthCheckRating:  HealthCheck
 
 const assertNever = (value: never): never => {
   throw new Error(
-    `Unhandled discriminated union member: ${JSON.stringify(value)}`
+    `Unhandled discriminated union me mber: ${JSON.stringify(value)}`
   );
 };
 
@@ -61,7 +64,36 @@ const EntryDetails: React.FC<{ entry: Entry }> = ({ entry }) => {
 };
 
 const PatientDetailPage: React.FC = () => {
-  const [{ patient, diagnoses }, dispatch] = useStateValue();
+  const [{ patient }, dispatch] = useStateValue();
+  // const [{ patient, diagnoses }, dispatch] = useStateValue();
+
+  const [modalOpen, setModalOpen] = React.useState<boolean>(false);
+  const [error, setError] = React.useState<string | undefined>();
+
+  const openModal = (): void => setModalOpen(true);
+
+  const closeModal = (): void => {
+    setModalOpen(false);
+    setError(undefined);
+  };
+
+  const submitNewEntry = async (values: EntryFormValues) => {
+    if (!patient) return;
+
+    const id = patient.id;
+    try {
+      const { data: newEntry } = await axios.post<Entry>(
+        `${apiBaseUrl}/patients/${id}/entries`,
+        values
+      );
+      console.log(newEntry)
+      dispatch(addEntryToPatient(id, newEntry));
+      closeModal();
+    } catch (e) {
+      console.error(e.response.data);
+      setError(e.response.data.error);
+    }
+  };
 
   const match = useRouteMatch('/patients/:id');
   const { id } = useParams<{ id: string }>();
@@ -114,6 +146,14 @@ const PatientDetailPage: React.FC = () => {
         );
       })}
       </Card.Group>
+      <br />
+      <AddEntryModal
+        modalOpen={modalOpen}
+        onSubmit={submitNewEntry}
+        error={error}
+        onClose={closeModal}
+      />
+      <Button onClick={() => openModal()}>Add New Entry</Button>
     </>
   );
 };
