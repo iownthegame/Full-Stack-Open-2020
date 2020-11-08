@@ -1,4 +1,4 @@
-import { NewPatientEntry, Gender, NewEntry, EntryType, HealthCheckRating, NewHealthCheckEntry } from './types';
+import { NewPatientEntry, Gender, NewEntry, HealthCheckRating, NewHealthCheckEntry, NewOccupationalHealthcareEntry, NewHospitalEntry } from './types';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -9,7 +9,7 @@ const toNewPatientEntry = (object: any): NewPatientEntry => {
     name: parseString(object.name, 'name'),
     ssn: parseString(object.ssn, 'ssn'),
     occupation: parseString(object.occupation, 'occupation'),
-    dateOfBirth: parseDate(object.dateOfBirth),
+    dateOfBirth: parseDate(object.dateOfBirth, 'date of birth'),
     gender: parseGender(object.gender),
   };
   /* eslint-enable @typescript-eslint/no-unsafe-member-access */
@@ -21,7 +21,7 @@ export const toNewEntry = (object: any): NewEntry => {
   if (object.type == 'HealthCheck') {
     const newEntry: NewHealthCheckEntry = {
       description: parseString(object.description, 'description'),
-      date: parseDate(object.date),
+      date: parseDate(object.date, 'date'),
       specialist: parseString(object.specialist, 'specialist'),
       type: 'HealthCheck',
       healthCheckRating: parseHealthCheckRating(object.healthCheckRating)
@@ -29,11 +29,32 @@ export const toNewEntry = (object: any): NewEntry => {
     return newEntry;
   }
 
-  const newEntry: NewEntry = {
+  if (object.type == 'OccupationalHealthcare') {
+    const newEntry: NewOccupationalHealthcareEntry = {
+      description: parseString(object.description, 'description'),
+      date: parseDate(object.date, 'date'),
+      specialist: parseString(object.specialist, 'specialist'),
+      type: 'OccupationalHealthcare',
+      employerName: parseString(object.employerName, 'employerName'),
+    };
+    if (object.sickLeave.startDate || object.sickLeave.EndDate) {
+      newEntry.sickLeave = {
+        startDate: parseDate(object.sickLeave.startDate, 'start date'),
+        endDate: parseDate(object.sickLeave.EndDate, 'end date')
+      };
+    }
+    return newEntry;
+  }
+
+  const newEntry: NewHospitalEntry = {
     description: parseString(object.description, 'description'),
-    date: parseDate(object.date),
+    date: parseDate(object.date, 'date'),
     specialist: parseString(object.specialist, 'specialist'),
-    type: parseEntryType(object.type),
+    type: 'Hospital',
+    discharge: {
+      date: parseDate(object.discharge.date, 'discharge date'),
+      criteria: parseString(object.discharge.criteria, 'criteria')
+    }
   };
 
   /* eslint-enable @typescript-eslint/no-unsafe-member-access */
@@ -56,9 +77,9 @@ const isDate = (date: string): boolean => {
   return Boolean(Date.parse(date));
 };
 
-const parseDate = (date: any): string => {
+const parseDate = (date: any, field: string): string => {
   if (!date || !isString(date) || !isDate(date)) {
-      throw new Error(`Incorrect or missing dateOfBirth: ${date as string}`);
+      throw new Error(`Incorrect or missing ${field}: ${date as string}`);
   }
   return date;
 };
@@ -72,17 +93,6 @@ const parseGender = (gender: any): Gender => {
       throw new Error(`Incorrect or missing visibility: ${gender as string}`);
   }
   return gender;
-};
-
-const isEntryType = (param: any): param is EntryType => {
-  return Object.values(EntryType).includes(param);
-};
-
-const parseEntryType = (type: any): EntryType => {
-  if  (!type || !isEntryType(type)) {
-    throw new Error(`Incorrect or missing visibility: ${type as string}`);
-  }
-  return type;
 };
 
 const isHealthCheckRating = (param: any): param is HealthCheckRating => {

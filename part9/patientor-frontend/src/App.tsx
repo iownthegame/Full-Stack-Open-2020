@@ -36,7 +36,7 @@ const App: React.FC = () => {
         dispatch(setDiagnosList(diagnosListFromApi));
       } catch (e) {
         console.error(e);
-      }
+    }
     };
     fetchDiagnosList();
   }, [dispatch]);

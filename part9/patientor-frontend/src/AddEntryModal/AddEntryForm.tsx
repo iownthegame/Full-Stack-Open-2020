@@ -2,7 +2,7 @@ import React from "react";
 import { Grid, Button } from "semantic-ui-react";
 import { Field, Formik, Form } from "formik";
 
-import { TextField, NumberField, DiagnosisSelection } from "../AddPatientModal/FormField";
+import { TextField, NumberField, DiagnosisSelection, SelectField } from "../AddPatientModal/FormField";
 import { HealthCheckEntry, OccupationalHealthcareEntry, HospitalEntry } from "../types";
 import { useStateValue } from "../state";
 
@@ -17,6 +17,12 @@ interface Props {
   onCancel: () => void;
 }
 
+const typeOptions = [
+  { value: "HealthCheck", label: "HealthCheck" },
+  { value: "OccupationalHealthcare", label: "OccupationalHealthcare" },
+  { value: "Hospital", label: "Hospital" }
+];
+
 export const AddEntryForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
   const [{ diagnoses }] = useStateValue();
 
@@ -27,12 +33,12 @@ export const AddEntryForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
         date: "",
         specialist: "",
         type: "HealthCheck",
-        healthCheckRating: 0,
+        healthCheckRating: 0
       }}
       onSubmit={onSubmit}
       validate={values => {
         const requiredError = "Field is required";
-        const errors: { [field: string]: string } = {};
+        const errors: { [field: string]: any } = {};
         if (!values.description) {
           errors.description = requiredError;
         }
@@ -42,10 +48,46 @@ export const AddEntryForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
         if (!values.specialist) {
           errors.specialist = requiredError;
         }
+        if (values.type === "HealthCheck") {
+          if (isNaN(values.healthCheckRating)) {
+            errors.healthCheckRating = requiredError;
+          }
+        }
+        else if (values.type === "OccupationalHealthcare") {
+          if (!values.employerName) {
+            errors.employerName = requiredError;
+          }
+          if (values?.sickLeave?.startDate || values?.sickLeave?.endDate) {
+            if (!values.sickLeave.startDate) {
+              errors.sickLeave = {
+                startDate: requiredError
+              };
+            }
+            if (!values.sickLeave.endDate) {
+              errors.sickLeave = {
+                ...errors.sickLeave,
+                endDate: requiredError
+              };
+            }
+          }
+        }
+        else if (values.type === "Hospital") {
+          if (!values?.discharge?.date) {
+            errors.discharge = {
+              date: requiredError
+            };
+          }
+          if (!values?.discharge?.criteria) {
+            errors.discharge = {
+              ...errors.discharge,
+              criteria: requiredError
+            };
+          }
+        }
         return errors;
       }}
     >
-      {({ isValid, dirty, setFieldValue, setFieldTouched }) => {
+      {({ isValid, dirty, setFieldValue, setFieldTouched, values }) => {
         return (
           <Form className="form ui">
             <Field
@@ -53,6 +95,11 @@ export const AddEntryForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
               placeholder="Description"
               name="description"
               component={TextField}
+            />
+            <SelectField
+              label="Type"
+              name="type"
+              options={typeOptions}
             />
             <Field
               label="Specialist"
@@ -66,13 +113,51 @@ export const AddEntryForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
               name="date"
               component={TextField}
             />
-            <Field
-              label="healthCheckRating"
-              name="healthCheckRating"
-              component={NumberField}
-              min={0}
-              max={3}
-            />
+            {values.type === "HealthCheck" &&
+              <Field
+                label="healthCheckRating"
+                name="healthCheckRating"
+                component={NumberField}
+                min={0}
+                max={3}
+              />
+            }
+            {values.type === "Hospital" &&
+              <>
+                <Field
+                  label="Discharge Date"
+                  placeholder="YYYY-MM-DD"
+                  name="discharge.date"
+                  component={TextField}
+                  />
+                <Field
+                  label="Discharge Criteria"
+                  name="discharge.criteria"
+                  component={TextField}
+                />
+              </>
+            }
+            {values.type === "OccupationalHealthcare" &&
+              <>
+                <Field
+                  label="Employer Name"
+                  name="employerName"
+                  component={TextField}
+                />
+                <Field
+                  label="Sick Leave Start Date"
+                  placeholder="YYYY-MM-DD"
+                  name="sickLeave.startDate"
+                  component={TextField}
+                  />
+                <Field
+                  label="Sick Leave End Date"
+                  placeholder="YYYY-MM-DD"
+                  name="sickLeave.endDate"
+                  component={TextField}
+                />
+              </>
+            }
             <DiagnosisSelection
               setFieldValue={setFieldValue}
               setFieldTouched={setFieldTouched}
