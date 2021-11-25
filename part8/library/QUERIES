@@ -1,0 +1,72 @@
+query {
+  bookCount
+  authorCount
+  allBooks {
+    id
+    title
+    published
+  }
+  allAuthors {
+    name
+    id
+    born
+    bookCount
+  }
+}
+
+mutation {
+  addBook(
+    title: "title3",
+    published: 2000,
+    author: "author2",
+    genres: ["c"]
+  ) {
+    title 
+    id
+  }
+}
+
+
+query {
+  allBooks(genre: "c") {
+    id
+    title
+    published
+    genres
+  }
+}
+
+mutation {
+  editAuthor(name: "author", setBornTo: 1990) {
+    name
+    born
+    id
+  }
+}
+
+query {
+  me {
+    username
+    id
+    favoriteGenre
+  }
+}
+
+mutation {
+  createUser(username: "huiyu", favoriteGenre: "genre") {
+    id
+    username
+    favoriteGenre
+  }
+}
+
+mutation {
+  login(username: "huiyu", password: "password") {
+    value
+  }
+}
+
+Header 
+{
+  "Authorization": "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Imh1aXl1IiwiaWQiOiI1ZjhmZjgwYzZjNWU1YjEwMmU0NzhhMmQiLCJpYXQiOjE2MDMyNzA3OTd9.7Y6fxFWCT1EWuhiwGIO2HFpLx9Jgnlx8DAKW17uHrRA"
+}

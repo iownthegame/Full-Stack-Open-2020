@@ -39,9 +39,8 @@ const App = () => {
           setNewName('')
           setNewNumber('')
         })
-        .catch(_error => {
-          setNotification('error', `Information of ${newName} has already been removed from server`)
-          setPersons(persons.filter(person => person.id !== id))
+        .catch(error => {
+          setNotification('error', error.response.data.error)
         })
       return
     }
@@ -58,6 +57,9 @@ const App = () => {
         setNotification('success', `Added ${newName}`)
         setNewName('')
         setNewNumber('')
+      })
+      .catch(error => {
+        setNotification('error', error.response.data.error)
       })
   }
 
